@@ -34,7 +34,7 @@ output$pageStub = renderUI(
         }')
     )),
     
-    titlePanel('Hollywood: Box Office Economics!'),
+    titlePanel('Hollywood: Trends!'),
     #SidebarLayout START
     sidebarLayout(
       #SidebarPanel START
@@ -46,20 +46,19 @@ output$pageStub = renderUI(
                    selectInput("studios", label = h4("Studios"), 
                                choices = list("parent_studio"),
                                selected = list("parent_studio")),
-                   
-                   selectInput("year", label = h4("Release Year"), 
-                               choices = list("release_year"),
-                               selected = list("release_year")),
-                   
                    sliderInput('plotHeight', 'Height of plot (in pixels)', 
                                min = 100, max = 500, value = 300)
       ), #SidebarPanel START
       # MAIN PANEL STARTS
       mainPanel(
         #tableOutput(""),
-        h4("Budget & Spending Power of Studios ($)"),
+        h4("90s to 2000s: Budget & Spending Power of Studios ($)"),
+        plotlyOutput("smoothplot1"),
+        h4("2010s: Budget & Spending Power of Studios ($)"),
         plotlyOutput("smoothplot")
-    
+
+        
+        
       ) # MAIN PANEL ENDs
     )
     #SidebarLayout ENDS
@@ -150,8 +149,24 @@ plot2008 = ggplot(movies_a_2008, mapping = aes(x = release_year,y = budget,
   geom_smooth(method = "loess", se = F) +
   scale_y_continuous(labels = comma)
 
-output$smoothplot = renderPlotly({
+plot1988 = ggplot(movies_a_1988, mapping = aes(x = release_year,y = budget,
+                                               color = major_studio)) + 
+  geom_smooth(method = "loess", se = F) +
+  scale_y_continuous(labels = comma)
+
+# render plot functions
+
+output$smoothplot1 = renderPlotly({
   
+  a = list(tickangle = 45)
+  
+  ggplotly(plot1988) %>% 
+    layout(height = input$plotHeight, xaxis = a)
+})
+
+
+
+output$smoothplot = renderPlotly({
   
   a = list(tickangle = 45)
   
