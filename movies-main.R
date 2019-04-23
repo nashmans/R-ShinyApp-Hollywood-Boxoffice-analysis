@@ -34,7 +34,7 @@ fluidPage(
         }')
   )),
   
-  titlePanel('Hollywood: Box Office Economics!'),
+  titlePanel('Hollywood: Box Office Economics'),
   #SidebarLayout START
   sidebarLayout(
     #SidebarPanel START
@@ -66,9 +66,9 @@ fluidPage(
     # MAIN PANEL STARTS
     mainPanel(
       #tableOutput(""),
-      h4("Major Studio vs. Independent Revenue ($)"),
+      h4("Major  vs Minor Studios' Revenue ($)"),
       plotlyOutput("plot"),
-      h4("Market Share : Global"),
+      h4("Market Share : US. Domestic vs. Global"),
       chorddiagOutput("chordPlot")
     ) # MAIN PANEL ENDs
   )
@@ -83,25 +83,25 @@ fluidPage(
 #******************************* DATA_SOURCE+MUNGING_START *********************************
 
 #read files
-movies <-  read_csv("C:/Users/Avinash/Documents/R Studio/Project/Shiny_movie_multipages/tmdb_5000_movies.csv")
-credits <-  read_csv("C:/Users/Avinash/Documents/R Studio/Project/Shiny_movie_multipages/tmdb_5000_credits.csv")
+movies =  read_csv("C:/Users/Avinash/Documents/R Studio/Project/Shiny_movie_multipages/tmdb_5000_movies.csv")
+credits =  read_csv("C:/Users/Avinash/Documents/R Studio/Project/Shiny_movie_multipages/tmdb_5000_credits.csv")
 # rename and join by movie id,title[NOTE:LEft join]
-movies <-  movies %>% rename(movie_id = id )  # rename id to movie_id
-movies_all <-  movies %>% left_join(credits, by=c('movie_id','title' )) 
+movies =  movies %>% rename(movie_id = id )  # rename id to movie_id
+movies_all =  movies %>% left_join(credits, by=c('movie_id','title' )) 
 names(movies_all)
 # COLUMN RENAMES/NEW IMP COLUMNS!!!
 #movies_all <-  movies_all %>% rename(title = title.x)  # renaming to << TITLE >>
 #movies_all <-  movies_all %>% select(-title.y)  # droppping duplicate title_id
 # creating new column -> YEAR
-movies_all <-  movies_all %>% mutate(release_date = as.Date(release_date,"%Y-%m-%d"))
-movies_all <-  movies_all %>% mutate(release_year = as.numeric(format(release_date,"%Y")))
+movies_all =  movies_all %>% mutate(release_date = as.Date(release_date,"%Y-%m-%d"))
+movies_all =  movies_all %>% mutate(release_year = as.numeric(format(release_date,"%Y")))
 # drop original title -- > incorrect and duplicate 
-movies_all <-  movies_all %>% select(-original_title)
+movies_all =  movies_all %>% select(-original_title)
 
 #                  ************ MASTER DATA (above)***************
 
 # subset movie_a manipulation 
-movies_a <- movies_all %>%  select(budget, movie_id,original_language,title,
+movies_a = movies_all %>%  select(budget, movie_id,original_language,title,
                                    production_companies,production_countries ,release_date,
                                    release_year,revenue, vote_average,runtime,vote_count) %>%
   filter(original_language == 'en')
@@ -110,7 +110,7 @@ str(movies_a)
 
 # BIG FIVE/major studio Column Data
 #Creating a new column production to represent the big film studio data ( 5 companies)
-movies_a <-  movies_a %>% mutate(major_studio = case_when(
+movies_a =  movies_a %>% mutate(major_studio = case_when(
   str_detect(production_companies, "Disney") ~ "Disney",
   str_detect(production_companies,"Fox") ~ "Disney",
   str_detect(production_companies,"Warner") ~ "Warner",
@@ -120,27 +120,27 @@ movies_a <-  movies_a %>% mutate(major_studio = case_when(
   TRUE~ "Minor Studios"
 )) 
 #Reading Boxoffice data scrapd from www.NUMBERS
-bo_data <-  read_csv("C:/Users/Avinash/Documents/R Studio/Project/Shiny_movie_multipages/bo_data.csv")
+bo_data =  read_csv("C:/Users/Avinash/Documents/R Studio/Project/Shiny_movie_multipages/bo_data.csv")
 
 # Renaming BOx office data to match MOVIE_a
-bo_data <-  bo_data %>% rename(title = movie, release_year = year_released )
+bo_data =  bo_data %>% rename(title = movie, release_year = year_released )
 names(bo_data)
 str(bo_data)
 #JOINS ----> movies_a + box_ofice data -> TMDB movies_a + box office 
 
 #Join for HISTOGRAM ONLY ----> Major&Minor, Box Office revenues(total_box_office)
-major_studio_bo <-  movies_a %>% select(title, major_studio,release_year) %>% 
+major_studio_bo =  movies_a %>% select(title, major_studio,release_year) %>% 
   # filter(major_studio != "Minor Studios") %>% 
   inner_join(bo_data,by = c( "title","release_year" )) %>% 
   mutate(as.numeric(release_year))
 #Join for CHORD_DIAG ONLY ----> Major,Box Office revenues
-major_studio_chord <-  movies_a %>% select(title, major_studio,release_year) %>% 
+major_studio_chord =  movies_a %>% select(title, major_studio,release_year) %>% 
   filter(major_studio != "Minor Studios") %>% 
   inner_join(bo_data,by = c( "title","release_year" )) %>% 
   mutate(as.numeric(release_year))
 
 #LINE CHART data ## rename file names 
-histo_bo <-  major_studio_bo %>% select(major_studio,american_box_office,
+histo_bo =  major_studio_bo %>% select(major_studio,american_box_office,
                                         international_box_office,release_year,total_box_office) %>% 
   mutate(studio = if_else(major_studio == "Minor Studios", "Minor Studios", "Major Studios")) %>% 
   group_by(studio, release_year) %>% 
@@ -149,7 +149,7 @@ histo_bo <-  major_studio_bo %>% select(major_studio,american_box_office,
             total_box_office = sum(total_box_office, na.rm = TRUE))
 #names(histo_bo)
 #CHORD DIAG data ## rename file names
-major_bo <-  major_studio_chord %>%  select(major_studio,american_box_office,
+major_bo =  major_studio_chord %>%  select(major_studio,american_box_office,
                                             international_box_office) %>% 
   group_by(major_studio) %>% summarise(AMER_BoxOffice=sum(american_box_office, na.rm = TRUE), 
                                        INT_BoxOffice=sum(international_box_office, na.rm = TRUE))
@@ -175,8 +175,8 @@ major_bo_INT = major_bo_INT[,-1] # na column created on conversion
 major_bo_INT = t(major_bo_INT)
 
 # Define server logic required to draw a histogram # do I need this?
-minx <- min(histo_bo$american_box_office)
-maxx <- max(histo_bo$american_box_office)
+minx = min(histo_bo$american_box_office)
+maxx = max(histo_bo$american_box_office)
 
 
 #******************************* DATA_SOURCE+MUNGING_ENDS*************************
@@ -185,11 +185,11 @@ maxx <- max(histo_bo$american_box_office)
 #******************************* OUTPUT_PLOT_FILES_START *********************************
 
 # LINE GRAPH PLOT OUTPUT
-output$plot <- renderPlotly({
+output$plot = renderPlotly({
   # size of the bins depend on the input 'bins'
   #size <- (maxx - minx) / input$bins
   
-  p <- ggplot(histo_bo, aes_string(x  = input$year, y = input$BoxOffice,  
+  p = ggplot(histo_bo, aes_string(x  = input$year, y = input$BoxOffice,  
                                    color = input$studios)) + 
     geom_line(alpha=0.5) +
     scale_y_continuous(labels = comma)+
@@ -197,14 +197,14 @@ output$plot <- renderPlotly({
     # theme_few() + scale_fill_few() # plain white/black border
     theme_tufte() + scale_fill_tableau() +
     ylab("Box Office Revenue $") + xlab("Years of Release")
-  a <- list(tickangle = 45)
+  a = list(tickangle = 45)
   
   ggplotly(p) %>% 
     layout(height = input$plotHeight, xaxis = a)
 })
 
 # CHORD DIAG PLOT OUTPUT
-output$chordPlot <- renderChorddiag({
+output$chordPlot = renderChorddiag({
   
   if(input$select_market =="America"){
     chorddiag(cdg, type = "bipartite",showTicks = F, 
@@ -225,21 +225,5 @@ output$chordPlot <- renderChorddiag({
 })
 
 #******************************* OUTPUT_PLOT_FILES_BEGIN *********************************
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
