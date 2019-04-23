@@ -5,7 +5,7 @@
 ###    loaded into Shiny Server at a time, limiting memory usage.
 
 ### Note, the URL "path" protocol currently doesn't work, because Shiny Server currently
-###    returns a "not found" error rather than passing the path to the session.
+###    returns a "not found" error rather than passing the path to the session.ii
 
 library(shiny)
 
