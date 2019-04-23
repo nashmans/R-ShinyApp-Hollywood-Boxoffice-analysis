@@ -5,27 +5,27 @@
 ###    loaded into Shiny Server at a time, limiting memory usage.
 
 ### Note, the URL "path" protocol currently doesn't work, because Shiny Server currently
-###    returns a "not found" error rather than passing the path to the session.ii
+###    returns a "not found" error rather than passing the path to the session.
 
 library(shiny)
 
 # put a message in console or server log; note this happens only when the app is started!
 cat("uiStub application started...\n")
 
-ui <- uiOutput("uiStub")                                # single-output stub ui
+ui = uiOutput("uiStub")                                # single-output stub ui
 
-server <- function(input, output, session) {
+server = function(input, output, session) {
     cat("Session started.\n")                               # this prints when a session starts
     onSessionEnded(function() {cat("Session ended.\n\n")})  # this prints when a session ends
     
     # build menu; same on all pages
-    output$uiStub <- renderUI(tagList(             # a single-output stub ui basically lets you
+    output$uiStub = renderUI(tagList(             # a single-output stub ui basically lets you
         fluidPage(                                  #     move the ui into the server function
             fluidRow(
                 column(12,
                        HTML("<h3><a href='?home'>Home</a> | ",
-                            "<a href='?movies-main'>Movies Main</a> |",
-                            "<a href='?movies-two'>Movies Sub</a>",
+                            "<a href='?movies-main'>Box Office</a> |",
+                            "<a href='?movies-two'>Trend:2010s</a>",
                             "</h3>")
                 )
             ),
