@@ -6,3 +6,4 @@ Research Questions:
 * Whats the Global and U.S. domestic market share of Hollywood productions
 * Whats driving the significant increase of revenue for major studios in the last 2 decades
 
+Visualisation in R Shiny app and create a chord diagram illustrate market share among different studios
